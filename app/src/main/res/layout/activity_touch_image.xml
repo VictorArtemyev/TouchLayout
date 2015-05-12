@@ -1,0 +1,34 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context="${relativePackage}.${activityClass}">
+
+    <com.vitman.touchlayout.app.view.TouchImageView
+            android:id="@+id/image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleType="centerInside"/>
+</RelativeLayout>
+
+<!--<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+                <!--xmlns:tools="http://schemas.android.com/tools"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent"-->
+                <!--tools:context="${relativePackage}.${activityClass}">-->
+
+    <!--<com.vitman.touchlayout.app.view.TouchRelativeLayout-->
+            <!--android:id="@+id/club_map_layout"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:gravity="center"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content">-->
+
+        <!--<ImageView-->
+                <!--android:id="@+id/club_map_holder_imageView"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:scaleType="centerInside"/>-->
+    <!--</com.vitman.touchlayout.app.view.TouchRelativeLayout>-->
+
+<!--</RelativeLayout>-->
