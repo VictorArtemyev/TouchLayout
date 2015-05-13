@@ -2,12 +2,15 @@ package com.vitman.touchlayout.app.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.os.Parcelable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.widget.RelativeLayout;
+import com.vitman.touchlayout.app.activity.MainActivity;
 
 /**
  * Created by Victor Artemjev on 07.05.2015.
@@ -91,13 +94,19 @@ public class TouchRelativeLayout extends RelativeLayout {
 //                            mPosY += dy;
                             mPosY += getFixDragTrans(dy, getHeight(), getScaledHeight());
 
+                             // X
                             if (mPosX > (getScaledWidth() - getWidth()) / 2) {
                                 mPosX = (getScaledWidth() - getWidth()) / 2;
-                            }
-                            else if (mPosX < (getScaledWidth() - getWidth()) / 2 - getScaledWidth() + getWidth()) {
+                            } else if (mPosX < (getScaledWidth() - getWidth()) / 2 - getScaledWidth() + getWidth()) {
                                 mPosX = (getScaledWidth() - getWidth()) / 2 - getScaledWidth() + getWidth();
                             }
 
+                            // Y
+                            if (mPosY > (getScaledHeight() - getHeight()) / 2) {
+                                mPosY = (getScaledHeight() - getHeight()) / 2;
+                            } else if (mPosY < (getScaledHeight() - getHeight()) / 2 - getScaledHeight() + getHeight()) {
+                                mPosY = (getScaledHeight() - getHeight()) / 2 - getScaledHeight() + getHeight();
+                            }
                             TouchRelativeLayout.this.invalidate();
                         }
 
@@ -107,8 +116,6 @@ public class TouchRelativeLayout extends RelativeLayout {
                     }
 
                     case MotionEvent.ACTION_UP: {
-//                        mFocusX = mFocusX - (motionEvent.getX() - mLastTouchX);
-//                        mFocusY = mFocusY - (motionEvent.getY() - mLastTouchY);
                         mActivePointerId = INVALID_POINTER_ID;
                         break;
                     }
@@ -162,18 +169,52 @@ public class TouchRelativeLayout extends RelativeLayout {
 
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
-            mScaleFactor *= detector.getScaleFactor();
+
+            float newScaleFactor = mScaleFactor * detector.getScaleFactor();
+
+             // X
+            float sizeX = getWidth() * (newScaleFactor - mScaleFactor) / 2;
+            float rankFocusX = mFocusX / (float) getWidth();
+            mPosX -= (sizeX * 2 * rankFocusX) - sizeX;
+
+            // Y
+            Log.e(LOG_TAG, "original height - " + MainActivity.fitMapHeight);
+            Log.e(LOG_TAG, "layout height - " + getHeight());
+            Log.e(LOG_TAG, "" + (getHeight() - MainActivity.fitMapHeight));
+            float size = (getHeight() - MainActivity.fitMapHeight) / 2;
+
+            float scaledSize = size * mScaleFactor;
+            Log.e(LOG_TAG, "scaledSize - " + scaledSize);
+
+            float sizeY;
+            if (mPosY < 0) {
+                sizeY = (getHeight() * (newScaleFactor - mScaleFactor) / 2);
+            } else {
+                sizeY = (getHeight() * (newScaleFactor - mScaleFactor) / 2);
+            }
+
+            float rankFocusY = mFocusY / (float) getHeight();
+            mPosY -= (sizeY * 2 * rankFocusY) - sizeY;
+
+            mScaleFactor = newScaleFactor;
             mScaleFactor = Math.max(MIN_ZOOM, Math.min(mScaleFactor, MAX_ZOOM));
+
             TouchRelativeLayout.this.invalidate();
+
             return true;
         }
     }
 
     @Override
     protected void dispatchDraw(Canvas canvas) {
+        Rect bounds = canvas.getClipBounds();
+        int centerX = bounds.centerX();
+        int centerY = bounds.centerY();
         canvas.save(Canvas.MATRIX_SAVE_FLAG);
-        canvas.translate(mPosX, mPosY);
-        canvas.scale(mScaleFactor, mScaleFactor, mFocusX, mFocusY);
+        canvas.scale(mScaleFactor, mScaleFactor, centerX, centerY);
+        Log.e(LOG_TAG, "Y - " + mPosY);
+        canvas.translate(mPosX / mScaleFactor, mPosY / mScaleFactor);
+
         super.dispatchDraw(canvas);
         canvas.restore();
     }

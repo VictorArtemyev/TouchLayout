@@ -15,6 +15,7 @@ import com.vitman.touchlayout.app.view.TouchRelativeLayout;
 public class MainActivity extends Activity {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
+    public static int fitMapHeight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,10 +40,11 @@ public class MainActivity extends Activity {
 
         Bitmap scaledMapBitmap = scaleToFitWidth(originalMapBitmap, displayWidth);
         final float fitMapWidth = scaledMapBitmap.getWidth();
-        final float fitMapHeight = scaledMapBitmap.getHeight();
+//        final float fitMapHeight = scaledMapBitmap.getHeight();
+        fitMapHeight = scaledMapBitmap.getHeight();
+
         Log.e(LOG_TAG, "Fit width size map: width - " + fitMapWidth + " height - " + fitMapHeight);
 
-//        ZoomMapRelativeLayout layout = (ZoomMapRelativeLayout) findViewById(R.id.club_map_layout);
         TouchRelativeLayout layout = (TouchRelativeLayout) findViewById(R.id.club_map_layout);
         ImageView mMapImageView = (ImageView) layout.findViewById(R.id.club_map_holder_imageView);
         mMapImageView.setImageBitmap(scaledMapBitmap);
