@@ -5,10 +5,9 @@
                 android:gravity="center"
                 tools:context="${relativePackage}.${activityClass}">
 
-    <com.vitman.touchlayout.app.view.TouchRelativeLayout
+    <com.vitman.touchlayout.app.view.TouchClubMapLayout
             android:id="@+id/club_map_layout"
             android:layout_gravity="center"
-            android:gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
@@ -16,7 +15,7 @@
                 android:id="@+id/club_map_holder_imageView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:scaleType="fitStart"/>
-    </com.vitman.touchlayout.app.view.TouchRelativeLayout>
+                android:scaleType="centerInside"/>
+    </com.vitman.touchlayout.app.view.TouchClubMapLayout>
 
 </RelativeLayout>

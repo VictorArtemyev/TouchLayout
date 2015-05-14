@@ -10,12 +10,11 @@ import android.util.Log;
 import android.view.Display;
 import android.widget.ImageView;
 import com.vitman.touchlayout.app.R;
-import com.vitman.touchlayout.app.view.TouchRelativeLayout;
+import com.vitman.touchlayout.app.view.TouchClubMapLayout;
 
 public class MainActivity extends Activity {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
-    public static int fitMapHeight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,15 +38,18 @@ public class MainActivity extends Activity {
 
 
         Bitmap scaledMapBitmap = scaleToFitWidth(originalMapBitmap, displayWidth);
-        final float fitMapWidth = scaledMapBitmap.getWidth();
-//        final float fitMapHeight = scaledMapBitmap.getHeight();
-        fitMapHeight = scaledMapBitmap.getHeight();
 
-        Log.e(LOG_TAG, "Fit width size map: width - " + fitMapWidth + " height - " + fitMapHeight);
+        float height = scaledMapBitmap.getHeight();
+        float width = scaledMapBitmap.getWidth();
 
-        TouchRelativeLayout layout = (TouchRelativeLayout) findViewById(R.id.club_map_layout);
+        Log.e(LOG_TAG, "Fit width size map: width - " + height + " height - " + width);
+
+        TouchClubMapLayout layout = (TouchClubMapLayout) findViewById(R.id.club_map_layout);
+
         ImageView mMapImageView = (ImageView) layout.findViewById(R.id.club_map_holder_imageView);
         mMapImageView.setImageBitmap(scaledMapBitmap);
+        layout.setMapHeight(height);
+        layout.setMapWidth(width);
     }
 
     public static Bitmap scaleToFitWidth(Bitmap b, int width) {

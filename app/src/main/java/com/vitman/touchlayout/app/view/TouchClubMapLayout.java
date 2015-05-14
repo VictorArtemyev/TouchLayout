@@ -1,26 +1,37 @@
 package com.vitman.touchlayout.app.view;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Canvas;
 import android.graphics.Rect;
-import android.os.Parcelable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.widget.RelativeLayout;
-import com.vitman.touchlayout.app.activity.MainActivity;
 
 /**
  * Created by Victor Artemjev on 07.05.2015.
  */
-public class TouchRelativeLayout extends RelativeLayout {
+public class TouchClubMapLayout extends RelativeLayout {
 
-    private static final String LOG_TAG = TouchRelativeLayout.class.getSimpleName();
+    private static final String LOG_TAG = TouchClubMapLayout.class.getSimpleName();
+
+    // Instance state
+    private static final String BUNDLE_INSTANCE_STATE = "instanceState";
+    private static final String BUNDLE_MAP_WIDTH = "mapWidth";
+    private static final String BUNDLE_MAP_HEIGHT = "mapHeight";
+    private static final String BUNDLE_SCALE_FACTOR = "scaleFactor";
+    private static final String BUNDLE_POSITION_X = "positionX";
+    private static final String BUNDLE_POSITION_Y = "positionY";
+
     private static final int INVALID_POINTER_ID = -1;
     private static final float MIN_ZOOM = 1f;
     private static final float MAX_ZOOM = 2f;
+    private static final String BUNDLE_SCREEN_ORIENTATION = "screenOrientation";
+
+    private float mMapWidth;
+    private float mMapHeight;
 
     private ScaleGestureDetector mScaleDetector;
     private float mScaleFactor = 1.f;
@@ -36,34 +47,60 @@ public class TouchRelativeLayout extends RelativeLayout {
     private float mLastTouchX;
     private float mLastTouchY;
 
-    public TouchRelativeLayout(Context context) {
+    private int mScreenOrientation;
+
+    private Context mContext;
+
+    public TouchClubMapLayout(Context context) {
         super(context);
         init(context);
     }
 
-    public TouchRelativeLayout(Context context, AttributeSet attrs) {
+    public TouchClubMapLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
 
-    public TouchRelativeLayout(Context context, AttributeSet attrs, int defStyle) {
+    public TouchClubMapLayout(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init(context);
     }
 
-    @Override
-    protected Parcelable onSaveInstanceState() {
-        return super.onSaveInstanceState();
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Parcelable state) {
-        super.onRestoreInstanceState(state);
-    }
+//    @Override
+//    protected Parcelable onSaveInstanceState() {
+//        Bundle bundle = new Bundle();
+//        bundle.putParcelable(BUNDLE_INSTANCE_STATE, super.onSaveInstanceState());
+//        bundle.putFloat(BUNDLE_MAP_WIDTH, mMapWidth);
+//        bundle.putFloat(BUNDLE_MAP_HEIGHT, mMapHeight);
+//        bundle.putFloat(BUNDLE_POSITION_X, mPosX);
+//        bundle.putFloat(BUNDLE_POSITION_Y, mPosY);
+//        bundle.putFloat(BUNDLE_SCALE_FACTOR, mScaleFactor);
+//        bundle.putInt(BUNDLE_SCREEN_ORIENTATION, mScreenOrientation);
+//        return bundle;
+//    }
+//
+//    @Override
+//    protected void onRestoreInstanceState(Parcelable state) {
+//        if (state instanceof Bundle) {
+//            Bundle bundle = (Bundle) state;
+//            mMapWidth = bundle.getFloat(BUNDLE_MAP_WIDTH);
+//            mMapHeight = bundle.getFloat(BUNDLE_MAP_HEIGHT);
+//            mScaleFactor = bundle.getFloat(BUNDLE_SCALE_FACTOR);
+//            mPosX = bundle.getFloat(BUNDLE_POSITION_X);
+//            mPosY = bundle.getFloat(BUNDLE_POSITION_Y);
+//            mScreenOrientation = bundle.getInt(BUNDLE_SCREEN_ORIENTATION);
+//            super.onRestoreInstanceState(bundle.getParcelable(BUNDLE_INSTANCE_STATE));
+//            return;
+//        }
+//        super.onRestoreInstanceState(state);
+//    }
 
     private void init(Context context) {
+        mContext = context;
+        mScreenOrientation = getScreenOrientation();
+//        fixInstantStateByScreenOrientation();
         mScaleDetector = new ScaleGestureDetector(context, new ScaleListener());
-        TouchRelativeLayout.this.setOnTouchListener(new OnTouchListener() {
+        TouchClubMapLayout.this.setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 mScaleDetector.onTouchEvent(motionEvent);
@@ -88,26 +125,12 @@ public class TouchRelativeLayout extends RelativeLayout {
                         if (!mScaleDetector.isInProgress()) {
                             final float dx = x - mLastTouchX;
                             final float dy = y - mLastTouchY;
-
-//                            mPosX += dx;
                             mPosX += getFixDragTrans(dx, getWidth(), getScaledWidth());
-//                            mPosY += dy;
                             mPosY += getFixDragTrans(dy, getHeight(), getScaledHeight());
 
-                             // X
-                            if (mPosX > (getScaledWidth() - getWidth()) / 2) {
-                                mPosX = (getScaledWidth() - getWidth()) / 2;
-                            } else if (mPosX < (getScaledWidth() - getWidth()) / 2 - getScaledWidth() + getWidth()) {
-                                mPosX = (getScaledWidth() - getWidth()) / 2 - getScaledWidth() + getWidth();
-                            }
+                            fixTransByScreenOrientation();
 
-                            // Y
-                            if (mPosY > (getScaledHeight() - getHeight()) / 2) {
-                                mPosY = (getScaledHeight() - getHeight()) / 2;
-                            } else if (mPosY < (getScaledHeight() - getHeight()) / 2 - getScaledHeight() + getHeight()) {
-                                mPosY = (getScaledHeight() - getHeight()) / 2 - getScaledHeight() + getHeight();
-                            }
-                            TouchRelativeLayout.this.invalidate();
+                            TouchClubMapLayout.this.invalidate();
                         }
 
                         mLastTouchX = x;
@@ -143,6 +166,16 @@ public class TouchRelativeLayout extends RelativeLayout {
         });
     }
 
+//    private void fixInstantStateByScreenOrientation() {
+//        if (mScreenOrientation == getScreenOrientation()) {
+//            return;
+//        }
+//        mScreenOrientation = getScreenOrientation();
+//        mPosX = 0f;
+//        mPosY = 0f;
+//        mScaleFactor = MIN_ZOOM;
+//    }
+
     private float getScaledWidth() {
         return getWidth() * mScaleFactor;
     }
@@ -156,6 +189,14 @@ public class TouchRelativeLayout extends RelativeLayout {
             return 0f;
         }
         return delta;
+    }
+
+    private float getScaledEmptyRegionByMapWidth() {
+        return mMapWidth * mScaleFactor;
+    }
+
+    private float getScaledEmptySpaceByMapHeight() {
+        return mMapHeight * mScaleFactor;
     }
 
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
@@ -172,34 +213,21 @@ public class TouchRelativeLayout extends RelativeLayout {
 
             float newScaleFactor = mScaleFactor * detector.getScaleFactor();
 
-             // X
+            //TODO refactor
+            // X
             float sizeX = getWidth() * (newScaleFactor - mScaleFactor) / 2;
             float rankFocusX = mFocusX / (float) getWidth();
             mPosX -= (sizeX * 2 * rankFocusX) - sizeX;
 
             // Y
-            Log.e(LOG_TAG, "original height - " + MainActivity.fitMapHeight);
-            Log.e(LOG_TAG, "layout height - " + getHeight());
-            Log.e(LOG_TAG, "" + (getHeight() - MainActivity.fitMapHeight));
-            float size = (getHeight() - MainActivity.fitMapHeight) / 2;
-
-            float scaledSize = size * mScaleFactor;
-            Log.e(LOG_TAG, "scaledSize - " + scaledSize);
-
-            float sizeY;
-            if (mPosY < 0) {
-                sizeY = (getHeight() * (newScaleFactor - mScaleFactor) / 2);
-            } else {
-                sizeY = (getHeight() * (newScaleFactor - mScaleFactor) / 2);
-            }
-
+            float sizeY = getHeight() * (newScaleFactor - mScaleFactor) / 2;
             float rankFocusY = mFocusY / (float) getHeight();
             mPosY -= (sizeY * 2 * rankFocusY) - sizeY;
 
             mScaleFactor = newScaleFactor;
             mScaleFactor = Math.max(MIN_ZOOM, Math.min(mScaleFactor, MAX_ZOOM));
 
-            TouchRelativeLayout.this.invalidate();
+            TouchClubMapLayout.this.invalidate();
 
             return true;
         }
@@ -212,10 +240,74 @@ public class TouchRelativeLayout extends RelativeLayout {
         int centerY = bounds.centerY();
         canvas.save(Canvas.MATRIX_SAVE_FLAG);
         canvas.scale(mScaleFactor, mScaleFactor, centerX, centerY);
-        Log.e(LOG_TAG, "Y - " + mPosY);
         canvas.translate(mPosX / mScaleFactor, mPosY / mScaleFactor);
 
         super.dispatchDraw(canvas);
         canvas.restore();
+    }
+
+    public void setMapWidth(float width) {
+        mMapWidth = width;
+    }
+
+    public void setMapHeight(float height) {
+        mMapHeight = height;
+    }
+
+    private void fixTransByScreenOrientation() {
+        if (getScreenOrientation() == Configuration.ORIENTATION_LANDSCAPE) {
+            fixTransByLandscape();
+        } else if (getScreenOrientation() == Configuration.ORIENTATION_PORTRAIT) {
+            fixTransByPortrait();
+        }
+    }
+
+    private int getScreenOrientation() {
+        return mContext.getResources().getConfiguration().orientation;
+    }
+
+    // TODO refactor
+    private void fixTransByLandscape() {
+        // X
+        float emptySpaceWidth = getScaledEmptyRegionByMapWidth();
+        if (emptySpaceWidth > getWidth()) {
+            float shift = (getScaledWidth() - getWidth()) / 2 - (getWidth() - mMapWidth) / 2 * mScaleFactor;
+            if (mPosX > shift) {
+                mPosX = shift;
+            } else if (mPosX < -shift) {
+                mPosX = -shift;
+            } else {
+                mPosX = 0;
+            }
+        }
+
+        // Y
+        if (mPosY > (getScaledHeight() - getHeight()) / 2) {
+            mPosY = (getScaledHeight() - getHeight()) / 2;
+        } else if (mPosY < (getScaledHeight() - getHeight()) / 2 - getScaledHeight() + getHeight()) {
+            mPosY = (getScaledHeight() - getHeight()) / 2 - getScaledHeight() + getHeight();
+        }
+
+    }
+
+    private void fixTransByPortrait() {
+        // Y
+        float emptySpaceHeight = getScaledEmptySpaceByMapHeight();
+        if (emptySpaceHeight > getHeight()) {
+            float shift = (getScaledHeight() - getHeight()) / 2 - (getHeight() - mMapHeight) / 2 * mScaleFactor;
+            if (mPosY > shift)
+                mPosY = shift;
+            else if (mPosY < -shift)
+                mPosY = -shift;
+        } else {
+            mPosY = 0;
+        }
+
+        // X
+        if (mPosX > (getScaledWidth() - getWidth()) / 2) {
+            mPosX = (getScaledWidth() - getWidth()) / 2;
+        } else if (mPosX < (getScaledWidth() - getWidth()) / 2 - getScaledWidth() + getWidth()) {
+            mPosX = (getScaledWidth() - getWidth()) / 2 - getScaledWidth() + getWidth();
+        }
     }
 }
