@@ -1,4 +1,4 @@
-package com.vitman.touchlayout.app.view;
+package com.vitman.touchlayout.app.layout;
 
 import android.content.Context;
 import android.content.res.Configuration;

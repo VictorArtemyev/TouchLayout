@@ -5,7 +5,7 @@
 <!--android:gravity="center"-->
 <!--tools:context="${relativePackage}.${activityClass}">-->
 
-<com.vitman.touchlayout.app.view.TouchRelativeLayout
+<com.vitman.touchlayout.app.layout.TouchRelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/club_map_layout"
         android:layout_gravity="center"
@@ -25,6 +25,6 @@
                 android:scaleType="centerInside"/>
     </RelativeLayout>
 
-</com.vitman.touchlayout.app.view.TouchRelativeLayout>
+</com.vitman.touchlayout.app.layout.TouchRelativeLayout>
 
         <!--</RelativeLayout>-->

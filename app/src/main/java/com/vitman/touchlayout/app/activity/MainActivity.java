@@ -13,7 +13,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 import com.vitman.touchlayout.app.R;
-import com.vitman.touchlayout.app.view.TouchRelativeLayout;
+import com.vitman.touchlayout.app.layout.TouchRelativeLayout;
 
 public class MainActivity extends Activity {
 
