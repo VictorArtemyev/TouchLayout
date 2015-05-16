@@ -3,7 +3,6 @@ package com.vitman.touchlayout.app.view;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Canvas;
-import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -13,9 +12,9 @@ import android.widget.RelativeLayout;
 /**
  * Created by Victor Artemjev on 07.05.2015.
  */
-public class TouchClubMapLayout extends RelativeLayout {
+public class TouchRelativeLayout extends RelativeLayout {
 
-    private static final String LOG_TAG = TouchClubMapLayout.class.getSimpleName();
+    private static final String LOG_TAG = TouchRelativeLayout.class.getSimpleName();
 
     // Instance state
     private static final String BUNDLE_INSTANCE_STATE = "instanceState";
@@ -51,17 +50,17 @@ public class TouchClubMapLayout extends RelativeLayout {
 
     private Context mContext;
 
-    public TouchClubMapLayout(Context context) {
+    public TouchRelativeLayout(Context context) {
         super(context);
         init(context);
     }
 
-    public TouchClubMapLayout(Context context, AttributeSet attrs) {
+    public TouchRelativeLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
 
-    public TouchClubMapLayout(Context context, AttributeSet attrs, int defStyle) {
+    public TouchRelativeLayout(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init(context);
     }
@@ -100,7 +99,7 @@ public class TouchClubMapLayout extends RelativeLayout {
         mScreenOrientation = getScreenOrientation();
 //        fixInstantStateByScreenOrientation();
         mScaleDetector = new ScaleGestureDetector(context, new ScaleListener());
-        TouchClubMapLayout.this.setOnTouchListener(new OnTouchListener() {
+        TouchRelativeLayout.this.setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 mScaleDetector.onTouchEvent(motionEvent);
@@ -130,7 +129,7 @@ public class TouchClubMapLayout extends RelativeLayout {
 
                             fixTransByScreenOrientation();
 
-                            TouchClubMapLayout.this.invalidate();
+                            TouchRelativeLayout.this.invalidate();
                         }
 
                         mLastTouchX = x;
@@ -227,7 +226,7 @@ public class TouchClubMapLayout extends RelativeLayout {
             mScaleFactor = newScaleFactor;
             mScaleFactor = Math.max(MIN_ZOOM, Math.min(mScaleFactor, MAX_ZOOM));
 
-            TouchClubMapLayout.this.invalidate();
+            TouchRelativeLayout.this.invalidate();
 
             return true;
         }
@@ -235,15 +234,28 @@ public class TouchClubMapLayout extends RelativeLayout {
 
     @Override
     protected void dispatchDraw(Canvas canvas) {
-        Rect bounds = canvas.getClipBounds();
-        int centerX = bounds.centerX();
-        int centerY = bounds.centerY();
-        canvas.save(Canvas.MATRIX_SAVE_FLAG);
-        canvas.scale(mScaleFactor, mScaleFactor, centerX, centerY);
-        canvas.translate(mPosX / mScaleFactor, mPosY / mScaleFactor);
-
+//        Rect bounds = canvas.getClipBounds();
+//        int centerX = bounds.centerX();
+//        int centerY = bounds.centerY();
+//        canvas.save(Canvas.MATRIX_SAVE_FLAG);
+//        canvas.scale(mScaleFactor, mScaleFactor, centerX, centerY);
+//        canvas.translate(mPosX / mScaleFactor, mPosY / mScaleFactor);
+        applyScaleAndTranslation();
         super.dispatchDraw(canvas);
         canvas.restore();
+    }
+
+    private View child() {
+        return getChildAt(0);
+    }
+
+    private void applyScaleAndTranslation() {
+        child().setScaleX(mScaleFactor);
+        child().setScaleY(mScaleFactor);
+        child().setPivotX(getWidth() / 2);
+        child().setPivotY(getHeight() / 2);
+        child().setTranslationX(mPosX / mScaleFactor);
+        child().setTranslationY(mPosY / mScaleFactor);
     }
 
     public void setMapWidth(float width) {

@@ -8,9 +8,12 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
 import com.vitman.touchlayout.app.R;
-import com.vitman.touchlayout.app.view.TouchClubMapLayout;
+import com.vitman.touchlayout.app.view.TouchRelativeLayout;
 
 public class MainActivity extends Activity {
 
@@ -44,12 +47,35 @@ public class MainActivity extends Activity {
 
         Log.e(LOG_TAG, "Fit width size map: width - " + height + " height - " + width);
 
-        TouchClubMapLayout layout = (TouchClubMapLayout) findViewById(R.id.club_map_layout);
+        // Pin
+        ImageView pinView = new ImageView(MainActivity.this);
+        pinView.setScaleType(ImageView.ScaleType.FIT_XY);
+        pinView.setImageResource(R.drawable.ic_pin);
+        // Layout params for pin
+        RelativeLayout.LayoutParams layoutParams =
+                new RelativeLayout.LayoutParams(
+//                        RelativeLayout.LayoutParams.WRAP_CONTENT,
+//                        RelativeLayout.LayoutParams.WRAP_CONTENT);
+                        80, 80);
+        layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+//        layoutParams.leftMargin = 100;
+//        layoutParams.topMargin = 200;
 
-        ImageView mMapImageView = (ImageView) layout.findViewById(R.id.club_map_holder_imageView);
-        mMapImageView.setImageBitmap(scaledMapBitmap);
+        pinView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(MainActivity.this, "CLICK!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        TouchRelativeLayout layout = (TouchRelativeLayout) findViewById(R.id.club_map_layout);
         layout.setMapHeight(height);
         layout.setMapWidth(width);
+
+        RelativeLayout holder = (RelativeLayout) findViewById(R.id.holder);
+        ImageView mMapImageView = (ImageView) holder.findViewById(R.id.club_map_holder_imageView);
+        mMapImageView.setImageBitmap(scaledMapBitmap);
+        holder.addView(pinView, layoutParams);
     }
 
     public static Bitmap scaleToFitWidth(Bitmap b, int width) {
