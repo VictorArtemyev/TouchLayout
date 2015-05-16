@@ -252,10 +252,12 @@ public class TouchRelativeLayout extends RelativeLayout {
     private void applyScaleAndTranslation() {
         child().setScaleX(mScaleFactor);
         child().setScaleY(mScaleFactor);
-        child().setPivotX(getWidth() / 2);
-        child().setPivotY(getHeight() / 2);
-        child().setTranslationX(mPosX / mScaleFactor);
-        child().setTranslationY(mPosY / mScaleFactor);
+//        child().setPivotX(getWidth() / 2);
+//        child().setPivotY(getHeight() / 2);
+//        child().setTranslationX(mPosX / mScaleFactor);
+//        child().setTranslationY(mPosY / mScaleFactor);
+        child().setTranslationX(mPosX);
+        child().setTranslationY(mPosY);
     }
 
     public void setMapWidth(float width) {
