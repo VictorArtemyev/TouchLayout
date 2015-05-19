@@ -13,10 +13,8 @@ import android.widget.RelativeLayout;
  * Created by Victor Artemjev on 07.05.2015.
  */
 public class TouchRelativeLayout extends RelativeLayout {
-
-    private static final String LOG_TAG = TouchRelativeLayout.class.getSimpleName();
-
     // Instance state
+    private static final String BUNDLE_SCREEN_ORIENTATION = "screenOrientation";
     private static final String BUNDLE_INSTANCE_STATE = "instanceState";
     private static final String BUNDLE_MAP_WIDTH = "mapWidth";
     private static final String BUNDLE_MAP_HEIGHT = "mapHeight";
@@ -27,7 +25,7 @@ public class TouchRelativeLayout extends RelativeLayout {
     private static final int INVALID_POINTER_ID = -1;
     private static final float MIN_ZOOM = 1f;
     private static final float MAX_ZOOM = 2f;
-    private static final String BUNDLE_SCREEN_ORIENTATION = "screenOrientation";
+
 
     private float mMapWidth;
     private float mMapHeight;
