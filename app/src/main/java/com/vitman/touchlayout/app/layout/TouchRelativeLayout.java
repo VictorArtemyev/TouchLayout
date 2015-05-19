@@ -209,27 +209,23 @@ public class TouchRelativeLayout extends RelativeLayout {
 
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
-
             float newScaleFactor = mScaleFactor * detector.getScaleFactor();
-
-            //TODO refactor
             // X
-            float sizeX = getWidth() * (newScaleFactor - mScaleFactor) / 2;
-            float rankFocusX = mFocusX / (float) getWidth();
-            mPosX -= (sizeX * 2 * rankFocusX) - sizeX;
-
+            mPosX -= translatePosition(getWidth(), newScaleFactor);
             // Y
-            float sizeY = getHeight() * (newScaleFactor - mScaleFactor) / 2;
-            float rankFocusY = mFocusY / (float) getHeight();
-            mPosY -= (sizeY * 2 * rankFocusY) - sizeY;
-
-            mScaleFactor = newScaleFactor;
-            mScaleFactor = Math.max(MIN_ZOOM, Math.min(mScaleFactor, MAX_ZOOM));
-
+            mPosY -= translatePosition(getHeight(), newScaleFactor);
+            mScaleFactor = Math.max(MIN_ZOOM, Math.min(newScaleFactor, MAX_ZOOM));
             TouchRelativeLayout.this.invalidate();
-
             return true;
         }
+    }
+
+    private float translatePosition(int measurement, float scaleFactor) {
+        float size;
+        float rankFocus;
+        size = measurement * (scaleFactor - mScaleFactor) / 2;
+        rankFocus = mFocusX / (float) measurement;
+        return (size * 2 * rankFocus) - size;
     }
 
     @Override
@@ -301,7 +297,6 @@ public class TouchRelativeLayout extends RelativeLayout {
         } else if (mPosY < (getScaledHeight() - getHeight()) / 2 - getScaledHeight() + getHeight()) {
             mPosY = (getScaledHeight() - getHeight()) / 2 - getScaledHeight() + getHeight();
         }
-
     }
 
     private void fixTransByPortrait() {
